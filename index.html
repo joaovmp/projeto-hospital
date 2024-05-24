@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #cc092f;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        form label, form input {
+            margin: 5px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        .actions button {
+            margin-right: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bem-vindo ao Sistema de Gestão Hospitalar</h1>
+
+        <div class="buttons">
+            <button onclick="fetchMedicos()">Gerenciar Médicos</button>
+            <button onclick="fetchPacientes()">Gerenciar Pacientes</button>
+            <button onclick="fetchConsultas()">Gerenciar Consultas</button>
+        </div>
+
+        <div id="medico-section" class="hidden">
+            <h2>Gerenciar Médicos</h2>
+            <form id="create-medico-form">
+                <label for="nome-medico">Nome:</label>
+                <input type="text" id="nome-medico" name="nome"><br>
+                <label for="especialidade-medico">Especialidade:</label>
+                <input type="text" id="especialidade-medico" name="especialidade"><br>
+                <button type="button" onclick="createMedico()">Criar Médico</button>
+            </form>
+            <table id="medicos-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Especialidade</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="paciente-section" class="hidden">
+            <h2>Gerenciar Pacientes</h2>
+            <form id="create-paciente-form">
+                <label for="nome-paciente">Nome:</label>
+                <input type="text" id="nome-paciente" name="nome"><br>
+                <label for="idade-paciente">Idade:</label>
+                <input type="number" id="idade-paciente" name="idade"><br>
+                <label for="sexo-paciente">Sexo:</label>
+                <input type="text" id="sexo-paciente" name="sexo"><br>
+                <label for="telefone-paciente">Telefone:</label>
+                <input type="text" id="telefone-paciente" name="telefone"><br>
+                <button type="button" onclick="createPaciente()">Criar Paciente</button>
+            </form>
+            <table id="pacientes-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Idade</th>
+                        <th>Sexo</th>
+                        <th>Telefone</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="consulta-section" class="hidden">
+            <h2>Gerenciar Consultas</h2>
+            <form id="create-consulta-form">
+                <label for="medico-consulta">Médico ID:</label>
+                <input type="number" id="medico-consulta" name="medico"><br>
+                <label for="paciente-consulta">Paciente ID:</label>
+                <input type="number" id="paciente-consulta" name="paciente"><br>
+                <label for="data-consulta">Data:</label>
+                <input type="date" id="data-consulta" name="data"><br>
+                <label for="motivo-consulta">Motivo:</label>
+                <input type="text" id="motivo-consulta" name="motivo"><br>
+                <button type="button" onclick="createConsulta()">Criar Consulta</button>
+            </form>
+            <table id="consultas-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Médico ID</th>
+                        <th>Paciente ID</th>
+                        <th>Data</th>
+                        <th>Motivo</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Funções para gerenciar médicos
+        async function fetchMedicos() {
+            const response = await fetch('/medico');
+            const medicos = await response.json();
+            const tableBody = document.querySelector('#medicos-table tbody');
+            tableBody.innerHTML = '';
+            medicos.forEach(medico => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${medico.id}</td>
+                    <td>${medico.nome}</td>
+                    <td>${medico.especialidade}</td>
+                    <td class="actions">
+                        <button onclick="editMedico(${medico.id})">Editar</button>
+                        <button onclick="deleteMedico(${medico.id})">Deletar</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            document.getElementById('medico-section').classList.remove('hidden');
+            document.getElementById('paciente-section').classList.add('hidden');
+            document.getElementById('consulta-section').classList.add('hidden');
+        }
+
+        async function createMedico() {
+            const nome = document.getElementById('nome-medico').value;
+            const especialidade = document.getElementById('especialidade-medico').value;
+            const response = await fetch('/medico', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ nome, especialidade }),
+            });
+            if (response.ok) {
+                alert('Médico criado com sucesso!');
+                fetchMedicos();
+            } else {
+                alert('Erro ao criar médico');
+            }
+        }
+
+        async function editMedico(id) {
+            const nome = prompt('Nome do médico:');
+            const especialidade = prompt('Especialidade do médico:');
+            const response = await fetch(`/medico/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ nome, especialidade }),
+            });
+            if (response.ok) {
+                alert('Médico atualizado com sucesso!');
+                fetchMedicos();
+            } else {
+                alert('Erro ao atualizar médico');
+            }
+        }
+
+        async function deleteMedico(id) {
+            const response = await fetch(`/medico/${id}`, {
+                method: 'DELETE',
+            });
+            if (response.ok) {
+                alert('Médico deletado com sucesso!');
+                fetchMedicos();
+            } else {
+                alert('Erro ao deletar médico');
+            }
+        }
+
+        // Funções para gerenciar pacientes
+        async function fetchPacientes() {
+            const response = await fetch('/paciente');
+            const pacientes = await response.json();
+            const tableBody = document.querySelector('#pacientes-table tbody');
+            tableBody.innerHTML = '';
+            pacientes.forEach(paciente => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${paciente.id}</td>
+                    <td>${paciente.nome}</td>
+                    <td>${paciente.idade}</td>
+                    <td>${paciente.sexo}</td>
+                    <td>${paciente.telefone}</td>
+                    <td class="actions">
+                        <button onclick="editPaciente(${paciente.id})">Editar</button>
+                        <button onclick="deletePaciente(${paciente.id})">Deletar</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            document.getElementById('medico-section').classList.add('hidden');
+            document.getElementById('paciente-section').classList.remove('hidden');
+            document.getElementById('consulta-section').classList.add('hidden');
+        }
+
+        async function createPaciente() {
+            const nome = document.getElementById('nome-paciente').value;
+            const idade = document.getElementById('idade-paciente').value;
+            const sexo = document.getElementById('sexo-paciente').value;
+            const telefone = document.getElementById('telefone-paciente').value;
+            const response = await fetch('/paciente', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ nome, idade, sexo, telefone }),
+            });
+            if (response.ok) {
+                alert('Paciente criado com sucesso!');
+                fetchPacientes();
+            } else {
+                alert('Erro ao criar paciente');
+            }
+        }
+
+        async function editPaciente(id) {
+            const nome = prompt('Nome do paciente:');
+            const idade = prompt('Idade do paciente:');
+            const sexo = prompt('Sexo do paciente:');
+            const telefone = prompt('Telefone do paciente:');
+            const response = await fetch(`/paciente/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ nome, idade, sexo, telefone }),
+            });
+            if (response.ok) {
+                alert('Paciente atualizado com sucesso!');
+                fetchPacientes();
+            } else {
+                alert('Erro ao atualizar paciente');
+            }
+        }
+
+        async function deletePaciente(id) {
+            const response = await fetch(`/paciente/${id}`, {
+                method: 'DELETE',
+            });
+            if (response.ok) {
+                alert('Paciente deletado com sucesso!');
+                fetchPacientes();
+            } else {
+                alert('Erro ao deletar paciente');
+            }
+        }
+
+        // Funções para gerenciar consultas
+        async function fetchConsultas() {
+            const response = await fetch('/consulta');
+            const consultas = await response.json();
+            const tableBody = document.querySelector('#consultas-table tbody');
+            tableBody.innerHTML = '';
+            consultas.forEach(consulta => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${consulta.id}</td>
+                    <td>${consulta.medicoId}</td>
+                    <td>${consulta.pacienteId}</td>
+                    <td>${new Date(consulta.data).toLocaleDateString()}</td>
+                    <td>${consulta.motivo}</td>
+                    <td class="actions">
+                        <button onclick="editConsulta(${consulta.id})">Editar</button>
+                        <button onclick="deleteConsulta(${consulta.id})">Deletar</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            document.getElementById('medico-section').classList.add('hidden');
+            document.getElementById('paciente-section').classList.add('hidden');
+            document.getElementById('consulta-section').classList.remove('hidden');
+        }
+
+        async function createConsulta() {
+            const medicoId = document.getElementById('medico-consulta').value;
+            const pacienteId = document.getElementById('paciente-consulta').value;
+            const data = document.getElementById('data-consulta').value;
+            const motivo = document.getElementById('motivo-consulta').value;
+            const response = await fetch('/consulta', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ medicoId, pacienteId, data, motivo }),
+            });
+            if (response.ok) {
+                alert('Consulta criada com sucesso!');
+                fetchConsultas();
+            } else {
+                alert('Erro ao criar consulta');
+            }
+        }
+
+        async function editConsulta(id) {
+            const medicoId = prompt('Médico ID:');
+            const pacienteId = prompt('Paciente ID:');
+            const data = prompt('Data (YYYY-MM-DD):');
+            const motivo = prompt('Motivo da consulta:');
+            const response = await fetch(`/consulta/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ medicoId, pacienteId, data, motivo }),
+            });
+            if (response.ok) {
+                alert('Consulta atualizada com sucesso!');
+                fetchConsultas();
+            } else {
+                alert('Erro ao atualizar consulta');
+            }
+        }
+
+        async function deleteConsulta(id) {
+            const response = await fetch(`/consulta/${id}`, {
+                method: 'DELETE',
+            });
+            if (response.ok) {
+                alert('Consulta deletada com sucesso!');
+                fetchConsultas();
+            } else {
+                alert('Erro ao deletar consulta');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+Listagem de caminhos de pasta
+O n�mero de s�rie do volume � 4488-146E
+C:.
+|   .env
+|   .eslintrc.js
+|   .gitignore
+|   .prettierrc
+|   database.db
+|   database.sqlite
+|   estrutura_do_projeto.txt
+|   index.html
+|   nest-cli.json
+|   ormconfig.json
+|   package-lock.json
+|   package.json
+|   README.md
+|   style.css
+|   tsconfig.build.json
+|   tsconfig.json
+|   
++---dist
+|   |   app.controller.js
+|   |   app.controller.js.map
+|   |   app.module.js
+|   |   app.module.js.map
+|   |   app.service.js
+|   |   app.service.js.map
+|   |   main.js
+|   |   main.js.map
+|   |   
+|   +---controllers
+|   |       consulta.controller.js
+|   |       consulta.controller.js.map
+|   |       medico.controller.js
+|   |       medico.controller.js.map
+|   |       paciente.controller.js
+|   |       paciente.controller.js.map
+|   |       
+|   +---entities
+|   |       entity.js
+|   |       entity.js.map
+|   |       
+|   \---services
+|           consulta.service.js
+|           consulta.service.js.map
+|           medico.service.js
+|           medico.service.js.map
+|           paciente.service.js
+|           paciente.service.js.map
+|           
++---src
+|   |   app.controller.spec.ts
+|   |   app.controller.ts
+|   |   app.module.ts
+|   |   app.service.ts
+|   |   main.ts
+|   |   
+|   +---controllers
+|   |       consulta.controller.ts
+|   |       medico.controller.ts
+|   |       paciente.controller.ts
+|   |       
+|   +---entities
+|   |       entity.ts
+|   |       
+|   +---migrations
+|   \---services
+|           consulta.service.ts
+|           medico.service.ts
+|           paciente.service.ts
+|           
+\---test
+        app.e2e-spec.ts
+        jest-e2e.json
+        
